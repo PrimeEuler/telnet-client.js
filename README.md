@@ -1,7 +1,7 @@
 telnet-client.js
 ================
 
-node.js telnet client that negociates TELNET Commands.
+node.js telnet client that processes TELNET Commands.
 
 ```bash
 RX: IAC.DO.terminalType
