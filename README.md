@@ -2,16 +2,23 @@ telnet-client.js
 ================
 
 node.js telnet client that negociates TELNET Commands.
-ex:
+
+
 RX: IAC.DO.terminalType
+
 TX: IAC.WILL.terminalType.IAC.WILL.windowSize
+
 RX: IAC.DO.windowSize
+
 TX: IAC.SB.windowSize.transmitBinary.200.transmitBinary.64.IAC.SE
+
 RX: IAC.SB.terminalType echo IAC.SE
+
 TX: IAC.SB.terminalType.transmitBinary.ANSI.IAC.SE
 
 
-Requirements:
+
+### Requirements:
 
 * [node.js](http://nodejs.org/) -- v0.8.7 or newer
 
@@ -28,21 +35,31 @@ var config = {
 }
 
 var c = new Telnet();
+
 c.connect(config);
+
 c.on('data', function (data) {
     console.log(data.toString());
 });
+
+
 c.on('error', function (error) {
     console.log("error", error);
 });
+
+
 c.on('timeout', function () {
     console.log("timeout");
 });
+
+
 c.on('close', function (had_error) {
     console.log("close",had_error);
 });
+
+
 c.on('end', function () {
     console.log("end");
 });
 
-###
+### TODO
