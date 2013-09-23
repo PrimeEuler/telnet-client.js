@@ -15,7 +15,7 @@ Requirements:
 
 * [node.js](http://nodejs.org/) -- v0.8.7 or newer
 
-Example:
+### Usage/API:
 
 var Telnet = require('../util-telnet');
 
@@ -44,3 +44,5 @@ c.on('close', function (had_error) {
 c.on('end', function () {
     console.log("end");
 });
+
+###
