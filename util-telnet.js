@@ -150,6 +150,19 @@ Telnet.prototype.processBuffer = function (buffer) {
                         break;
                 }
                 break;
+            case "DONT":
+                switch (result.cmd[key].option) {
+                    default:
+                        res_CMD += result.cmd[key].option;
+                        break;
+                }
+                break;
+            case "WONT":
+                switch (result.cmd[key].option) {
+                    default:
+                        res_CMD = "IAC.DONT." + result.cmd[key].option;
+                        break;
+                }
             default:
                 break;
         }
