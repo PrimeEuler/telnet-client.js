@@ -48,6 +48,7 @@ Telnet.prototype.connect = function (opts) {
 
     this._host = opts.host || 'localhost';
     this._port = opts.port || 23;
+    this._log = opts.log || false;
     this._username = opts.username;
     this._password = opts.password;
     this._enpassword = opts.enpassword;
@@ -113,47 +114,50 @@ Telnet.prototype.processBuffer = function (buffer) {
 
 
     Object.keys(result.cmd).forEach(function (key) {
-
-        var req_CMD = "IAC." + result.cmd[key].operation + "." + result.cmd[key].option
-        var res_CMD = "";
-        switch (req_CMD) {
-
-            case "IAC.DO.terminalType":
-                res_CMD = "IAC.WILL.terminalType.IAC.WILL.windowSize";
+        var req_CMD =  "IAC." + result.cmd[key].operation + "." + result.cmd[key].option;
+        var res_CMD = "IAC.WONT.";
+        switch (result.cmd[key].operation) {
+            case "DO":
+                switch (result.cmd[key].option) {
+                    case "terminalType":
+                        res_CMD = "IAC.WILL." + result.cmd[key].option;
+                        res_CMD += ".IAC.WILL.windowSize";
+                        break;
+                    case "windowSize":
+                        res_CMD = "IAC.SB.windowSize.transmitBinary.200.transmitBinary.64.IAC.SE";
+                        break;
+                    default:
+                        res_CMD += result.cmd[key].option;
+                        break;
+                }
                 break;
-            case "IAC.DO.terminalSpeed":
-                res_CMD = "IAC.WONT.terminalSpeed";
+            case "WILL":
+                switch (result.cmd[key].option) {
+                    case "suppressGoAhead":
+                        res_CMD = "IAC.DO." + result.cmd[key].option;
+                        break;
+                    default:
+                        res_CMD = "IAC.DO." + result.cmd[key].option;
+                        break;
+                }
                 break;
-            case "IAC.DO.displayLocation":
-                res_CMD = "IAC.WONT.displayLocation";
-                break;
-            case "IAC.DO.environmentOption":
-                res_CMD = "IAC.WONT.environmentOption";
-                break;
-            case "IAC.DO.windowSize":
-                res_CMD = "IAC.SB.windowSize.transmitBinary.200.transmitBinary.64.IAC.SE";
-                break;
-            case "IAC.DO.echo":
-                res_CMD = "IAC.WONT.echo";
-                break;
-            case "IAC.DO.remoteFlowControl":
-                res_CMD = "IAC.WONT.remoteFlowControl";
-                break;
-            case "IAC.SB.terminalType echo IAC.SE":
-                res_CMD = "IAC.SB.terminalType.transmitBinary.ANSI.IAC.SE";
-                break;
-            case "IAC.WILL.suppressGoAhead":
-                res_CMD = "IAC.DO.suppressGoAhead";
-                break;
-            case "IAC.WILL.status":
-                break;
-            case "IAC.DONT.echo":
-                break;
-            case "IAC.WILL.echo":
+            case "SB":
+                switch (result.cmd[key].option) {
+                    case "terminalType echo IAC.SE":
+                        res_CMD = "IAC.SB.terminalType.transmitBinary.ANSI.IAC.SE";
+                        break;
+                    default:
+                        break;
+                }
                 break;
             default:
                 break;
         }
+        if (_self._log) {
+            console.log("rx:", req_CMD);
+            console.log("tx:", res_CMD);
+        }
+        
         _self.write(_self.cmdtoBuffer(res_CMD));
     });
 
@@ -177,7 +181,7 @@ Telnet.prototype.login = function (data) {
             _self.write(_self._password + "\r\n");
         }
     }
-    else if ((data.toString().indexOf(">") > -1 ) && !_self._en) {
+    else if ((data.toString().indexOf(">") > -1) && !_self._en && _self._enpassword.length > 0) {
         _self._en = true;
         _self.write("en\r\n");
     }
