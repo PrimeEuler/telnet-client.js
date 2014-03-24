@@ -3,6 +3,9 @@ telnet-client.js
 
 node.js telnet client that processes TELNET Commands.
 
+Component of:
+* [NMS.js](https://github.com/PrimeEuler/NMS.js)
+
 ```bash
 RX: IAC.DO.terminalType
 
